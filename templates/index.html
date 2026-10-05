@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexaNotif | Dashboard</title>
+<style>
+  :root {
+    --bg: #f4f2ff; --card: #ffffff; --text: #1e1b4b; --muted: #6b6a8a;
+    --border: #ebe8ff; --soft: #f6f4ff;
+    --brand: #7c3aed; --pink: #ec4899; --blue: #3b82f6;
+    --high: #ff4d6d; --medium: #ff9f1c; --low: #4cc9f0;
+    --shadow: 0 14px 40px rgba(124, 58, 237, .14);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--text); min-height: 100vh;
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    background: linear-gradient(180deg, #f4f2ff 0%, #fdf2f8 100%) fixed;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 20px 60px; position: relative; }
+
+  /* ===== Hero band ===== */
+  .band {
+    position: relative; overflow: hidden; color: #fff; padding: 22px 0 120px;
+    background: linear-gradient(120deg, #4f46e5 0%, #7c3aed 45%, #db2777 100%);
+  }
+  .blob { position: absolute; border-radius: 50%; filter: blur(2px); opacity: .55; animation: float 9s ease-in-out infinite; }
+  .b1 { width: 260px; height: 260px; top: -90px; left: -60px; background: radial-gradient(circle, #22d3ee, transparent 70%); }
+  .b2 { width: 320px; height: 320px; top: -120px; right: 8%; background: radial-gradient(circle, #fbbf24, transparent 70%); animation-delay: -3s; }
+  .b3 { width: 240px; height: 240px; bottom: -110px; left: 38%; background: radial-gradient(circle, #f472b6, transparent 70%); animation-delay: -6s; }
+  @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(18px) scale(1.08); } }
+
+  .top { position: relative; display: flex; justify-content: space-between; align-items: center; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 21px; letter-spacing: -.3px; }
+  .logo {
+    width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; font-size: 19px;
+    background: rgba(255, 255, 255, .22); border: 1px solid rgba(255, 255, 255, .4); backdrop-filter: blur(6px);
+  }
+  .pill {
+    display: flex; align-items: center; gap: 8px; padding: 8px 15px; border-radius: 999px; font-size: 13px; font-weight: 600;
+    background: rgba(255, 255, 255, .2); border: 1px solid rgba(255, 255, 255, .35); backdrop-filter: blur(6px);
+  }
+  .live { width: 9px; height: 9px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 0 4px rgba(74, 222, 128, .3); animation: pulse 2s infinite; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); } }
+
+  .hero { position: relative; text-align: center; padding: 46px 0 0; }
+  .hero h1 { margin: 0 0 10px; font-size: clamp(28px, 5.4vw, 48px); font-weight: 800; letter-spacing: -1.2px; line-height: 1.08; text-shadow: 0 4px 24px rgba(0, 0, 0, .18); }
+  .hero p { margin: 0; font-size: 18px; opacity: .92; }
+
+  /* ===== Cards ===== */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow); }
+
+  /* Composer */
+  .composer { margin-top: -62px; padding: 20px; position: relative; }
+  .composer::before {
+    content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: 24px;
+    background: linear-gradient(120deg, #22d3ee, #7c3aed, #ec4899, #fbbf24); opacity: .55; filter: blur(10px);
+  }
+  textarea {
+    width: 100%; min-height: 112px; resize: vertical; padding: 15px 17px; font: inherit; font-size: 15px;
+    color: var(--text); background: var(--soft); border: 2px solid transparent; border-radius: 16px; outline: none;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+  }
+  textarea::placeholder { color: #9d9bbd; }
+  textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 5px rgba(124, 58, 237, .14); background: #fff; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+  select {
+    padding: 12px 14px; border-radius: 13px; font: inherit; font-size: 14px; font-weight: 600;
+    color: var(--brand); background: #efeaff; border: 1px solid #ddd3ff; cursor: pointer;
+  }
+  .spacer { flex: 1; }
+  button { font: inherit; cursor: pointer; }
+  .btn-primary {
+    padding: 13px 26px; border: 0; border-radius: 14px; color: #fff; font-weight: 700; font-size: 15px;
+    background: linear-gradient(120deg, #7c3aed, #ec4899 60%, #f59e0b);
+    background-size: 160% 100%; box-shadow: 0 10px 24px rgba(236, 72, 153, .4);
+    transition: transform .12s, box-shadow .12s, background-position .4s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); background-position: 100% 0; box-shadow: 0 14px 30px rgba(236, 72, 153, .5); }
+  .btn-primary:disabled { opacity: .65; cursor: wait; transform: none; }
+  .btn-ghost {
+    padding: 12px 18px; border-radius: 13px; font-size: 14px; font-weight: 600;
+    color: var(--brand); background: #fff; border: 2px dashed #cdbdff;
+  }
+  .btn-ghost:hover { background: #f3edff; }
+
+  /* Result */
+  .result {
+    margin-top: 16px; padding: 16px 20px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+    background: linear-gradient(120deg, #ecfdf5, #eff6ff); border-color: #c7f0dc; animation: pop .35s ease;
+  }
+  .result .label { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: #0f766e; font-weight: 700; }
+  .result .sentence { font-weight: 700; margin-top: 2px; }
+  .hidden { display: none; }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+
+  /* ===== Stat cards ===== */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+  .stat { position: relative; overflow: hidden; padding: 20px; color: #fff; border: 0; transition: transform .2s; }
+  .stat:hover { transform: translateY(-4px); }
+  .stat::after { content: ""; position: absolute; width: 130px; height: 130px; right: -40px; top: -40px; border-radius: 50%; background: rgba(255, 255, 255, .18); }
+  .stat::before { content: ""; position: absolute; width: 80px; height: 80px; right: 40px; bottom: -40px; border-radius: 50%; background: rgba(255, 255, 255, .12); }
+  .stat.high { background: linear-gradient(135deg, #ff6b81, #ff2d75); box-shadow: 0 14px 30px rgba(255, 45, 117, .35); }
+  .stat.medium { background: linear-gradient(135deg, #ffc371, #ff7a18); box-shadow: 0 14px 30px rgba(255, 122, 24, .35); }
+  .stat.low { background: linear-gradient(135deg, #43e0f0, #4f7cff); box-shadow: 0 14px 30px rgba(79, 124, 255, .35); }
+  .stat-top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; }
+  .stat .name { font-size: 15px; font-weight: 700; opacity: .95; }
+  .ico { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; background: rgba(255, 255, 255, .25); }
+  .stat .num { position: relative; z-index: 1; font-size: 46px; font-weight: 800; letter-spacing: -1.5px; margin: 10px 0 12px; line-height: 1; }
+  .bar { position: relative; z-index: 1; height: 7px; border-radius: 99px; background: rgba(255, 255, 255, .3); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; border-radius: 99px; background: #fff; transition: width .6s ease; }
+
+  /* ===== Feed ===== */
+  .feed { padding: 22px; }
+  .feed-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+  .feed-head h2 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -.3px; }
+  .tabs { display: flex; gap: 6px; background: #efeaff; padding: 5px; border-radius: 999px; }
+  .tab { border: 0; background: transparent; color: var(--muted); padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; transition: all .15s; }
+  .tab:hover { color: var(--brand); }
+  .tab.on { color: #fff; background: linear-gradient(120deg, #7c3aed, #ec4899); box-shadow: 0 6px 14px rgba(124, 58, 237, .35); }
+
+  .row {
+    display: flex; gap: 14px; align-items: flex-start; padding: 15px 16px; margin-bottom: 12px;
+    background: var(--soft); border-radius: 18px; border-left: 6px solid var(--low);
+    transition: transform .15s, box-shadow .15s; animation: pop .3s ease;
+  }
+  .row:hover { transform: translateX(4px); box-shadow: 0 10px 24px rgba(124, 58, 237, .12); }
+  .row.high { border-left-color: var(--high); background: linear-gradient(90deg, #fff0f3, var(--soft) 55%); }
+  .row.medium { border-left-color: var(--medium); background: linear-gradient(90deg, #fff6e8, var(--soft) 55%); }
+  .row.low { border-left-color: var(--low); background: linear-gradient(90deg, #eafaff, var(--soft) 55%); }
+
+  .tile { flex: none; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 22px; }
+  .c-work { background: #dbe8ff; }
+  .c-personal { background: #ffdff0; }
+  .c-social { background: #ece0ff; }
+  .c-promotion { background: #ffe8cc; }
+  .c-alert { background: #ffd9de; }
+  .c-other { background: #e5e7eb; }
+
+  .main { flex: 1; min-width: 0; }
+  .msg { font-weight: 700; word-break: break-word; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 3px; text-transform: capitalize; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; align-content: flex-start; }
+  .badge { padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .badge.p-high { background: linear-gradient(120deg, #ff6b81, #ff2d75); color: #fff; }
+  .badge.p-medium { background: linear-gradient(120deg, #ffc371, #ff7a18); color: #fff; }
+  .badge.p-low { background: linear-gradient(120deg, #43e0f0, #4f7cff); color: #fff; }
+  .badge.delivered { background: #d9f99d; color: #3f6212; }
+  .badge.digest { background: #e0d4ff; color: #5b21b6; }
+  .badge.blocked { background: #e5e7eb; color: #4b5563; }
+  .badge.cat { background: #fff; color: var(--brand); border: 1px solid #ddd3ff; text-transform: capitalize; }
+
+  .seg { display: inline-flex; margin-top: 11px; background: #fff; border: 1px solid #e3dcff; border-radius: 11px; overflow: hidden; }
+  .seg button { border: 0; background: transparent; color: var(--muted); padding: 5px 12px; font-size: 12px; font-weight: 700; }
+  .seg button + button { border-left: 1px solid #eee9ff; }
+  .seg button:hover { background: #f3edff; }
+  .seg button.on-high { background: var(--high); color: #fff; }
+  .seg button.on-medium { background: var(--medium); color: #fff; }
+  .seg button.on-low { background: #4f9cff; color: #fff; }
+
+  .empty { text-align: center; color: var(--muted); padding: 44px 10px; }
+  .empty b { display: block; font-size: 44px; margin-bottom: 8px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+    background: linear-gradient(120deg, #4f46e5, #db2777); color: #fff; padding: 12px 20px; border-radius: 14px;
+    font-size: 14px; font-weight: 600; transition: all .25s; box-shadow: 0 12px 30px rgba(79, 70, 229, .45);
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: 1fr; }
+    .row { flex-wrap: wrap; }
+    .badges { justify-content: flex-start; width: 100%; padding-left: 60px; }
+    .spacer { display: none; }
+    .btn-primary { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="band">
+  <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i>
+  <div class="wrap" style="padding-bottom:0">
+    <header class="top">
+      <div class="brand"><span class="logo">🔔</span><span>NexaNotif</span></div>
+      <span class="pill"><i class="live"></i> Dashboard</span>
+    </header>
+    <section class="hero">
+      <h1>Smart Notification Management</h1>
+      <p>Let AI organize your notifications ✨</p>
+    </section>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="card composer">
+    <textarea id="text" placeholder="Enter your notification... (Ctrl + Enter to analyze)"></textarea>
+    <div class="actions">
+      <select id="app" title="Source app">
+        <option>WhatsApp</option><option>Gmail</option><option>Instagram</option>
+        <option>Bank</option><option>Shopping</option>
+      </select>
+      <button class="btn-ghost" id="demoBtn">🎲 Load demo set</button>
+      <span class="spacer"></span>
+      <button class="btn-primary" id="analyzeBtn">✨ Analyze Notification</button>
+    </div>
+  </section>
+
+  <section class="card result hidden" id="result"></section>
+
+  <section class="stats">
+    <div class="card stat high">
+      <div class="stat-top"><span class="name">Important</span><span class="ico">🔴</span></div>
+      <div class="num" id="n-high">0</div>
+      <div class="bar"><i id="b-high"></i></div>
+    </div>
+    <div class="card stat medium">
+      <div class="stat-top"><span class="name">Normal</span><span class="ico">🟡</span></div>
+      <div class="num" id="n-medium">0</div>
+      <div class="bar"><i id="b-medium"></i></div>
+    </div>
+    <div class="card stat low">
+      <div class="stat-top"><span class="name">Low</span><span class="ico">⚪</span></div>
+      <div class="num" id="n-low">0</div>
+      <div class="bar"><i id="b-low"></i></div>
+    </div>
+  </section>
+
+  <section class="card feed">
+    <div class="feed-head">
+      <h2>📬 Latest Notifications</h2>
+      <div class="tabs" id="tabs">
+        <button class="tab on" data-f="all">All</button>
+        <button class="tab" data-f="delivered">Delivered</button>
+        <button class="tab" data-f="digest">Digest</button>
+        <button class="tab" data-f="blocked">Blocked</button>
+      </div>
+    </div>
+    <div id="list"></div>
+  </section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const LABEL = { high: "Important", medium: "Normal", low: "Low" };
+const STATUS = { delivered: "Delivered", digest: "In digest", blocked: "Duplicate blocked" };
+const SENTENCE = {
+  delivered: "Delivered to you right away.",
+  digest: "Held back and added to your digest.",
+  blocked: "Blocked as a duplicate."
+};
+const CAT_ICON = { work: "💼", personal: "💬", social: "👥", promotion: "🏷️", alert: "🚨" };
+const SAMPLE = [
+  ["Bank", "Your OTP is 48213. Do not share it"],
+  ["Bank", "Your OTP is 48213. Do not share it"],
+  ["Instagram", "Priya liked your photo"],
+  ["Shopping", "Flat 50% off on Fashion today only"],
+  ["Gmail", "Deadline for Finance report is today"],
+  ["WhatsApp", "Missed call from Arun"]
+];
+
+let items = [];
+let filter = "all";
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+async function postJSON(url, body) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function load() {
+  try {
+    items = await (await fetch("/api/notifications")).json();
+    render();
+  } catch (e) {
+    toast("Could not reach the server");
+  }
+}
+
+function render() {
+  const counts = { high: 0, medium: 0, low: 0 };
+  items.forEach(i => counts[i.priority]++);
+  const total = items.length || 1;
+  for (const k of ["high", "medium", "low"]) {
+    $("n-" + k).textContent = counts[k];
+    $("b-" + k).style.width = (counts[k] / total * 100) + "%";
+  }
+
+  const list = $("list");
+  list.replaceChildren();
+  const shown = items.filter(i => filter === "all" || i.status === filter);
+  if (!shown.length) {
+    const e = el("div", "empty");
+    e.append(el("b", "", "📭"), el("span", "", "Nothing here yet. Analyze a notification above or load the demo set."));
+    list.append(e);
+    return;
+  }
+  shown.forEach(i => list.append(row(i)));
+}
+
+function row(i) {
+  const r = el("div", "row " + i.priority);
+  r.append(el("div", "tile c-" + (CAT_ICON[i.category] ? i.category : "other"), CAT_ICON[i.category] || "🔔"));
+
+  const main = el("div", "main");
+  main.append(el("div", "msg", i.text));
+  main.append(el("div", "meta", `${i.app} · ${i.category} · ${i.time}`));
+
+  const seg = el("div", "seg");
+  for (const lvl of ["high", "medium", "low"]) {
+    const b = el("button", i.priority === lvl ? "on-" + lvl : "", LABEL[lvl]);
+    b.title = "Mark as " + LABEL[lvl];
+    b.onclick = () => feedback(i.id, lvl);
+    seg.append(b);
+  }
+  main.append(seg);
+  r.append(main);
+
+  const badges = el("div", "badges");
+  badges.append(el("span", "badge p-" + i.priority, i.priority_label));
+  badges.append(el("span", "badge " + i.status, STATUS[i.status]));
+  r.append(badges);
+  return r;
+}
+
+function showResult(i) {
+  const box = $("result");
+  box.replaceChildren();
+  const left = el("div");
+  left.append(el("div", "label", "Analysis result"), el("div", "sentence", SENTENCE[i.status]));
+  box.append(left, el("span", "spacer"));
+  const b = el("div", "badges");
+  b.append(
+    el("span", "badge p-" + i.priority, i.priority_label),
+    el("span", "badge cat", (CAT_ICON[i.category] || "🔔") + " " + i.category),
+    el("span", "badge " + i.status, STATUS[i.status])
+  );
+  box.append(b);
+  box.classList.remove("hidden");
+}
+
+async function analyze() {
+  const text = $("text").value.trim();
+  if (!text) { toast("Type a notification first"); $("text").focus(); return; }
+  const btn = $("analyzeBtn");
+  btn.disabled = true;
+  btn.textContent = "Analyzing...";
+  try {
+    const item = await postJSON("/api/notify", { app: $("app").value, text });
+    showResult(item);
+    $("text").value = "";
+    await load();
+  } catch (e) {
+    toast("Something went wrong. Is the server running?");
+  }
+  btn.disabled = false;
+  btn.textContent = "✨ Analyze Notification";
+}
+
+async function demo() {
+  for (const [app, text] of SAMPLE) await postJSON("/api/notify", { app, text });
+  await load();
+  toast("Demo notifications added 🎉");
+}
+
+async function feedback(id, priority) {
+  await postJSON("/api/feedback", { id, priority });
+  await load();
+  toast("Saved! Retrain the model to apply your correction.");
+}
+
+$("analyzeBtn").onclick = analyze;
+$("demoBtn").onclick = demo;
+$("text").addEventListener("keydown", e => {
+  if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) analyze();
+});
+$("tabs").addEventListener("click", e => {
+  const t = e.target.closest(".tab");
+  if (!t) return;
+  filter = t.dataset.f;
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x === t));
+  render();
+});
+
+load();
+</script>
+</body>
+</html>
