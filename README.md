@@ -51,5 +51,5 @@ status (Delivered / Digest / Blocked), then dashboard. User feedback is saved to
 `data/feedback.csv` and used when the models are retrained.
 
 ## Note
-The dataset is synthetic and template-based, so accuracy is near perfect. It validates
+The dataset is synthetic template-based, so accuracy is near perfect. It validates
 the pipeline; real-world performance would need a real labeled dataset.
