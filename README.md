@@ -47,7 +47,7 @@ Open http://127.0.0.1:5000 in your browser.
 ## How It Works
 User notification, then Flask API, then text preprocessing + TF-IDF, then Naive Bayes
 classifiers (category and priority), then duplicate check, then delivery rules, then
-status (Delivered / Digest / Blocked), then dashboard. User feedback is saved to
+status (Delivered / Digest / Blocked), then dashboard. User feedback is saved
 `data/feedback.csv` and used when the models are retrained.
 
 ## Note
